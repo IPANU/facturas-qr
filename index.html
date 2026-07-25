@@ -46,7 +46,7 @@
           facturasLeidas = [];
           actualizarLista();
           alert("Paquete cargado correctamente.");
-          // ❌ Ya no detenemos la cámara aquí
+          detenerLectura(); // ✅ cerramos la cámara después de leer el paquete
         } catch {
           alert("Formato inválido. El QR debe contener un JSON con las facturas.");
         }
@@ -60,7 +60,7 @@
       alert("Primero debes escanear el paquete.");
       return;
     }
-    lector = new Html5Qrcode("reader");
+    lector = new Html5Qrcode("reader"); // ✅ nuevo lector para reiniciar cámara
     lector.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
       qr => {
         procesarFactura(qr);
@@ -102,5 +102,3 @@
 </script>
 </body>
 </html>
-
-
