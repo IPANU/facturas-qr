@@ -35,6 +35,7 @@
   let facturasLeidas = [];
   let lector = null;
 
+  // Escanea el QR del paquete (JSON con facturas)
   function iniciarLecturaPaquete() {
     detenerLectura();
     lector = new Html5Qrcode("reader");
@@ -42,15 +43,17 @@
       qr => {
         try {
           facturasPaquete = JSON.parse(qr);
+          facturasLeidas = [];
           actualizarLista();
           alert("Paquete cargado correctamente.");
-          detenerLectura();
+          detenerLectura(); // se detiene porque solo se necesita leer una vez
         } catch {
           alert("Formato inválido. El QR debe contener un JSON con las facturas.");
         }
       });
   }
 
+  // Escanea facturas individuales (lectura continua)
   function iniciarLecturaFacturas() {
     detenerLectura();
     lector = new Html5Qrcode("reader");
@@ -60,19 +63,24 @@
       });
   }
 
+  // Procesa cada factura escaneada
   function procesarFactura(codigo) {
     if (facturasPaquete.includes(codigo)) {
       if (!facturasLeidas.includes(codigo)) facturasLeidas.push(codigo);
     } else {
-      facturasPaquete.push(codigo + " (fuera de paquete)");
+      if (!facturasPaquete.includes(codigo + " (fuera de paquete)")) {
+        facturasPaquete.push(codigo + " (fuera de paquete)");
+      }
     }
     actualizarLista();
   }
 
+  // Detener cámara
   function detenerLectura() {
     if (lector) lector.stop().catch(() => {});
   }
 
+  // Actualizar lista visual
   function actualizarLista() {
     const lista = document.getElementById("lista");
     lista.innerHTML = "";
@@ -90,3 +98,4 @@
 </script>
 </body>
 </html>
+
