@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Validador de Facturas QR</title>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<style>
+  body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+  h2 { text-align: center; color: #003366; }
+  button { background: #0078d7; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+  ul { list-style: none; padding: 0; }
+  li { margin: 5px 0; padding: 10px; border-radius: 5px; }
+  .pendiente { background: #ccc; }
+  .valida { background: #4CAF50; color: white; }
+  .invalida { background: #f44336; color: white; }
+  #estado { margin-top: 20px; font-weight: bold; text-align: center; }
+  #reader { width: 100%; max-width: 400px; margin: 10px auto; }
+</style>
+</head>
+<body>
+  <h2>Validador de Facturas</h2>
+  <div style="text-align:center;">
+    <button onclick="iniciarLecturaPaquete()">Escanear QR del Paquete</button>
+    <button onclick="iniciarLecturaFacturas()">Escanear Facturas</button>
+    <button onclick="detenerLectura()">Detener Cámara</button>
+  </div>
+  <div id="reader"></div>
+  <h3>Facturas del Paquete:</h3>
+  <ul id="lista"></ul>
+  <div id="estado"></div>
+
+<script>
+  let facturasPaquete = [];
+  let facturasLeidas = [];
+  let lector = null;
+
+  function iniciarLecturaPaquete() {
+    detenerLectura();
+    lector = new Html5Qrcode("reader");
+    lector.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
+      qr => {
+        try {
+          facturasPaquete = JSON.parse(qr);
+          actualizarLista();
+          alert("Paquete cargado correctamente.");
+          detenerLectura();
+        } catch {
+          alert("Formato inválido. El QR debe contener un JSON con las facturas.");
+        }
+      });
+  }
+
+  function iniciarLecturaFacturas() {
+    detenerLectura();
+    lector = new Html5Qrcode("reader");
+    lector.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
+      qr => {
+        procesarFactura(qr);
+      });
+  }
+
+  function procesarFactura(codigo) {
+    if (facturasPaquete.includes(codigo)) {
+      if (!facturasLeidas.includes(codigo)) facturasLeidas.push(codigo);
+    } else {
+      facturasPaquete.push(codigo + " (fuera de paquete)");
+    }
+    actualizarLista();
+  }
+
+  function detenerLectura() {
+    if (lector) lector.stop().catch(() => {});
+  }
+
+  function actualizarLista() {
+    const lista = document.getElementById("lista");
+    lista.innerHTML = "";
+    facturasPaquete.forEach(f => {
+      let li = document.createElement("li");
+      li.textContent = f;
+      if (f.includes("(fuera")) li.className = "invalida";
+      else if (facturasLeidas.includes(f)) li.className = "valida";
+      else li.className = "pendiente";
+      lista.appendChild(li);
+    });
+    document.getElementById("estado").textContent =
+      `Estado: ${facturasLeidas.length} leídas, ${facturasPaquete.length - facturasLeidas.length} pendientes.`;
+  }
+</script>
+</body>
+</html>
