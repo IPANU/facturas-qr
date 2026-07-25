@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Validador de Facturas QR</title>
+<title>Validador de Facturas Despachos IPANU</title>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <style>
   body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
@@ -19,9 +19,9 @@
 </style>
 </head>
 <body>
-  <h2>Validador de Facturas</h2>
+  <h2>Validador de Facturas Despachos IPANU</h2>
   <div style="text-align:center;">
-    <button onclick="iniciarLecturaPaquete()">Escanear QR del Paquete</button>
+    <button onclick="iniciarLecturaPaquete()">Escanear Paquete</button>
     <button onclick="iniciarLecturaFacturas()">Escanear Facturas</button>
     <button onclick="detenerLectura()">Detener Cámara</button>
   </div>
@@ -40,30 +40,30 @@
     detenerLectura();
     lector = new Html5Qrcode("reader");
     lector.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
-      qr => {
+      codigo => {
         try {
-          facturasPaquete = JSON.parse(qr);
+          facturasPaquete = JSON.parse(codigo);
           facturasLeidas = [];
           actualizarLista();
           alert("Paquete cargado correctamente.");
-          detenerLectura(); // ✅ cerramos la cámara después de leer el paquete
+          detenerLectura(); // cerramos cámara después de leer el paquete
         } catch {
-          alert("Formato inválido. El QR debe contener un JSON con las facturas.");
+          alert("Formato inválido. El código debe contener un JSON con las facturas.");
         }
       });
   }
 
-  // Escanea facturas individuales (lectura continua)
+  // Escanea facturas individuales (lectura continua de códigos de barras)
   function iniciarLecturaFacturas() {
     detenerLectura();
     if (facturasPaquete.length === 0) {
       alert("Primero debes escanear el paquete.");
       return;
     }
-    lector = new Html5Qrcode("reader"); // ✅ nuevo lector para reiniciar cámara
+    lector = new Html5Qrcode("reader");
     lector.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
-      qr => {
-        procesarFactura(qr);
+      codigo => {
+        procesarFactura(codigo);
       });
   }
 
