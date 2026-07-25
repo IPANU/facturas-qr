@@ -46,7 +46,7 @@
           facturasLeidas = [];
           actualizarLista();
           alert("Paquete cargado correctamente.");
-          detenerLectura(); // se detiene porque solo se necesita leer una vez
+          // ❌ Ya no detenemos la cámara aquí
         } catch {
           alert("Formato inválido. El QR debe contener un JSON con las facturas.");
         }
@@ -56,6 +56,10 @@
   // Escanea facturas individuales (lectura continua)
   function iniciarLecturaFacturas() {
     detenerLectura();
+    if (facturasPaquete.length === 0) {
+      alert("Primero debes escanear el paquete.");
+      return;
+    }
     lector = new Html5Qrcode("reader");
     lector.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
       qr => {
@@ -98,4 +102,5 @@
 </script>
 </body>
 </html>
+
 
