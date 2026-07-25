@@ -62,6 +62,8 @@
       alert("Primero debes escanear el paquete.");
       return;
     }
+    // limpiar contenedor antes de reiniciar
+    document.getElementById("reader").innerHTML = "";
     lector = new Html5Qrcode("reader");
     lector.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
       codigo => {
