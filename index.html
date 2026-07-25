@@ -50,7 +50,9 @@
         } catch {
           alert("Formato inválido. El código debe contener un JSON con las facturas.");
         }
-      });
+      },
+      error => { console.warn("Error al leer paquete:", error); }
+    );
   }
 
   // Escanea facturas individuales (lectura continua de códigos de barras)
@@ -64,7 +66,9 @@
     lector.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
       codigo => {
         procesarFactura(codigo);
-      });
+      },
+      error => { console.warn("Error al leer factura:", error); }
+    );
   }
 
   // Procesa cada factura escaneada
@@ -81,7 +85,11 @@
 
   // Detener cámara
   function detenerLectura() {
-    if (lector) lector.stop().catch(() => {});
+    if (lector) {
+      lector.stop().then(() => {
+        lector.clear();
+      }).catch(() => {});
+    }
   }
 
   // Actualizar lista visual
